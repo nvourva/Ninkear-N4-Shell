@@ -116,7 +116,24 @@ def create_mini_pc_shell():
         
         shell_with_back_cutout = shell_with_back_cutout.union(positioned_corner_base)
     
-    return shell_with_back_cutout
+    # Create the structure to hold the fan.
+    fan_box = cq.Workplane("XY") \
+        .rect(84, 84) \
+        .extrude(25)
+
+    # Create the inner cavity by subtracting the wall thickness
+    inner_fan_box = cq.Workplane("XY") \
+    .rect(81, 81) \
+    .extrude(25)
+    
+    # Hollow the fan box structure
+    fan_box_shell = fan_box.cut(inner_fan_box)
+    
+    position_fan_box_shell = fan_box_shell.translate((0,0,height))
+    
+    mini_pc_shell = shell_with_back_cutout.union(position_fan_box_shell)
+
+    return mini_pc_shell
 
 # Generate the shell
 result = create_mini_pc_shell()
