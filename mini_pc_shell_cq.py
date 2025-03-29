@@ -14,6 +14,7 @@ def create_mini_pc_shell():
     width = 106   # mm
     height = 38   # mm
     wall_thickness = 1.5  # mm
+    edge_radius = 3.5
     
     # Top cutout dimensions
     cutout_length = 80  # mm
@@ -26,7 +27,7 @@ def create_mini_pc_shell():
     # Create the outer shell
     outer_shell = cq.Workplane("XY") \
         .rect(length, width) \
-        .extrude(height)
+        .extrude(height).edges("|Z").fillet(edge_radius)
     
     # Create the inner cavity by subtracting the wall thickness
     inner_shell = cq.Workplane("XY") \
@@ -36,7 +37,7 @@ def create_mini_pc_shell():
     # Create the bottom lip where the bottom panel rests.
     bottom_lip = cq.Workplane("XY") \
         .rect(length - (2 * 0.4), width - (2 * 0.4)) \
-        .extrude(1.8)
+        .extrude(1.8).edges("|Z").fillet(edge_radius)
         
     # Subtract bottom lip from outer shell
     shell_with_lip = outer_shell.cut(bottom_lip)
