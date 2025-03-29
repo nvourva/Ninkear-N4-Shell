@@ -120,20 +120,25 @@ def create_mini_pc_shell():
     # Hollow the fan box structure
     fan_box_shell = fan_box.cut(inner_fan_box)
     
+    #Move the fan box to its proper location.
     position_fan_box_shell = fan_box_shell.translate((0,0,height))
     
     mini_pc_shell = shell_with_back_cutout.union(position_fan_box_shell)
     
+    #Create the screw pillar
     screw_pillar = cq.Workplane("XY") \
         .rect(9, 9) \
         .extrude(19)
-        
+
+    # It needs  holes for the standoffs
     screw_pillar_hole = cq.Workplane("XY") \
         .circle(2) \
         .extrude(6)
-        
+    
+    # Drill da hole
     screw_pillar_with_hole = screw_pillar.cut(screw_pillar_hole)
-        
+    
+    # Screw pillar offsets
     screw_pillar_offset_long = length/2 - 4.5 - 3.5
     screw_pillar_offset_short = width/2 - 4.5 - 3.5
     
@@ -144,9 +149,10 @@ def create_mini_pc_shell():
         (-screw_pillar_offset_long, -screw_pillar_offset_short)    # Bottom left
     ]
     
+    #Let's add the pillars
     for x, y in screw_pillars:
         
-        # Translate the corner base to the correct position
+        # Translate the screw pillars to the correct position
         positioned_pillars = screw_pillar_with_hole \
             .translate((x, y, height -19 - wall_thickness))
         
