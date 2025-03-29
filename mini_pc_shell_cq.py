@@ -42,14 +42,15 @@ def create_mini_pc_shell():
         .rect(length - (2 * wall_thickness), width - (2 * wall_thickness)) \
         .extrude(height - wall_thickness) \
 
-        
+    # Create the bottom lip where the bottom panel rests.
     bottom_lip = cq.Workplane("XY") \
         .rect(length - (2 * 0.4), width - (2 * 0.4)) \
         .extrude(1.8)
         
+    # Subtract bottom lip from outer shell
     shell_with_lip = outer_shell.cut(bottom_lip)
     
-    # Subtract inner cavity from outer shell
+    # Subtract inner cavity from shell with lip.
     shell_with_cavity = shell_with_lip.cut(inner_shell)
     
     # Create the top cutout
@@ -100,19 +101,17 @@ def create_mini_pc_shell():
     # Calculate corner positions
     offset = 38  # Half of 80mm
     corners = [
-        (offset, offset, 180),     # Top right
-        (offset, -offset, 90),    # Bottom right
-        (-offset, offset, 270),    # Top left
-        (-offset, -offset, 0)    # Bottom left
+        (offset, offset),     # Top right
+        (offset, -offset),    # Bottom right
+        (-offset, offset),    # Top left
+        (-offset, -offset)    # Bottom left
     ]
     
     # Add corner extensions with mount points
-    for x, y, rotation in corners:
-        # Rotate the corner base
-        rotated_corner_base = corner_base.rotate((0,0,0), (0,0,1), rotation)
+    for x, y in corners:
         
-        # Translate the rotated corner base to the correct position
-        positioned_corner_base = rotated_corner_base \
+        # Translate the corner base to the correct position
+        positioned_corner_base = corner_base \
             .translate((x, y, height - wall_thickness))
         
         shell_with_back_cutout = shell_with_back_cutout.union(positioned_corner_base)
