@@ -20,7 +20,7 @@ def create_mini_pc_shell():
     cutout_width = 80   # mm
     
     # Back face cutout dimensions
-    back_cutout_length = 87  # mm
+    back_cutout_length = 89  # mm
     back_cutout_width = 27   # mm
     
     # Create the outer shell
