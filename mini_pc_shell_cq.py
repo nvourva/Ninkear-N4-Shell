@@ -59,7 +59,7 @@ def create_mini_pc_shell():
     
     # Create front face cutout
     front_cutout = cq.Workplane("XZ") \
-        .rect(60, 10) \
+        .rect(35, 10) \
         .extrude(wall_thickness)
     
     # Position the front cutout
@@ -67,10 +67,11 @@ def create_mini_pc_shell():
     # Translate to front face (along Y-axis) and adjust position
     positioned_front_cutout = front_cutout \
         .rotate((0,0,0), (1,0,0), 0) \
-        .translate((-length/2 + 60/2 + 20, width/2, 12 ))
+        .translate((-length/2 + 35/2 + 44, width/2, 12 ))
     
     # Cut out the front surface
     shell_with_front_cutout = shell_with_cutout.cut(positioned_front_cutout)
+        
     
     # Create back face cutout
     back_cutout = cq.Workplane("XZ") \
@@ -157,6 +158,19 @@ def create_mini_pc_shell():
             .translate((x, y, height -19 - wall_thickness))
         
         mini_pc_shell = mini_pc_shell.union(positioned_pillars)
+    
+    # Can I fit a power button?
+    power_button_cutout = cq.Workplane("XY") \
+        .circle(5.35) \
+        .extrude(wall_thickness)
+    
+    # Will it be in the right place?
+    positioned_power_button = power_button_cutout \
+        .rotate((0,0,0), (1,0,0), 90) \
+        .translate((-length/2 + 10.7/2 + 20, width/2, 7.3 + 5.35 ))
+    
+    # Make the hole!
+    mini_pc_shell = mini_pc_shell.cut(positioned_power_button)
 
     return mini_pc_shell
 
