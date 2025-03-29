@@ -6,15 +6,6 @@ def create_corner_base():
         .rect(5, 5) \
         .extrude(1.5)
     
-    # piece_to_remove = (
-    #     cq.Workplane("XY")
-    #     .rect(4.5, 4.5)  # Create a rectangle of 4x4
-    #     .extrude(12.5)  # Extrude it to the specified height
-    #     .translate((0.25, 0.25, 1))  # Position it correctly
-    # )
-    
-    # corner_base = corner_extension.cut(piece_to_remove)
-    
     return corner_extension
 
 def create_mini_pc_shell():
@@ -99,12 +90,12 @@ def create_mini_pc_shell():
     corner_base = create_corner_base()
     
     # Calculate corner positions
-    offset = 38  # Half of 80mm
+    corner_offset = 38
     corners = [
-        (offset, offset),     # Top right
-        (offset, -offset),    # Bottom right
-        (-offset, offset),    # Top left
-        (-offset, -offset)    # Bottom left
+        (corner_offset, corner_offset),     # Top right
+        (corner_offset, -corner_offset),    # Bottom right
+        (-corner_offset, corner_offset),    # Top left
+        (-corner_offset, -corner_offset)    # Bottom left
     ]
     
     # Add corner extensions with mount points
@@ -132,6 +123,34 @@ def create_mini_pc_shell():
     position_fan_box_shell = fan_box_shell.translate((0,0,height))
     
     mini_pc_shell = shell_with_back_cutout.union(position_fan_box_shell)
+    
+    screw_pillar = cq.Workplane("XY") \
+        .rect(9, 9) \
+        .extrude(19)
+        
+    screw_pillar_hole = cq.Workplane("XY") \
+        .circle(2) \
+        .extrude(6)
+        
+    screw_pillar_with_hole = screw_pillar.cut(screw_pillar_hole)
+        
+    screw_pillar_offset_long = length/2 - 4.5 - 3.5
+    screw_pillar_offset_short = width/2 - 4.5 - 3.5
+    
+    screw_pillars = [
+        (screw_pillar_offset_long, screw_pillar_offset_short),     # Top right
+        (screw_pillar_offset_long, -screw_pillar_offset_short),    # Bottom right
+        (-screw_pillar_offset_long, screw_pillar_offset_short),    # Top left
+        (-screw_pillar_offset_long, -screw_pillar_offset_short)    # Bottom left
+    ]
+    
+    for x, y in screw_pillars:
+        
+        # Translate the corner base to the correct position
+        positioned_pillars = screw_pillar_with_hole \
+            .translate((x, y, height -19 - wall_thickness))
+        
+        mini_pc_shell = mini_pc_shell.union(positioned_pillars)
 
     return mini_pc_shell
 
