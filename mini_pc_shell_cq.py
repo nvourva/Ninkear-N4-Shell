@@ -4,18 +4,18 @@ def create_corner_base():
     # Create corner extension
     corner_extension = cq.Workplane("XY") \
         .rect(5, 5) \
-        .extrude(13.5)
+        .extrude(1.5)
     
-    piece_to_remove = (
-        cq.Workplane("XY")
-        .rect(4.5, 4.5)  # Create a rectangle of 4x4
-        .extrude(12.5)  # Extrude it to the specified height
-        .translate((0.25, 0.25, 1))  # Position it correctly
-    )
+    # piece_to_remove = (
+    #     cq.Workplane("XY")
+    #     .rect(4.5, 4.5)  # Create a rectangle of 4x4
+    #     .extrude(12.5)  # Extrude it to the specified height
+    #     .translate((0.25, 0.25, 1))  # Position it correctly
+    # )
     
-    corner_base = corner_extension.cut(piece_to_remove)
+    # corner_base = corner_extension.cut(piece_to_remove)
     
-    return corner_base
+    return corner_extension
 
 def create_mini_pc_shell():
     # Shell external dimensions
@@ -40,10 +40,17 @@ def create_mini_pc_shell():
     # Create the inner cavity by subtracting the wall thickness
     inner_shell = cq.Workplane("XY") \
         .rect(length - (2 * wall_thickness), width - (2 * wall_thickness)) \
-        .extrude(height - wall_thickness)
+        .extrude(height - wall_thickness) \
+
+        
+    bottom_lip = cq.Workplane("XY") \
+        .rect(length - (2 * 0.4), width - (2 * 0.4)) \
+        .extrude(1.8)
+        
+    shell_with_lip = outer_shell.cut(bottom_lip)
     
     # Subtract inner cavity from outer shell
-    shell_with_cavity = outer_shell.cut(inner_shell)
+    shell_with_cavity = shell_with_lip.cut(inner_shell)
     
     # Create the top cutout
     top_cutout = cq.Workplane("XY") \
@@ -106,7 +113,7 @@ def create_mini_pc_shell():
         
         # Translate the rotated corner base to the correct position
         positioned_corner_base = rotated_corner_base \
-            .translate((x, y, height - 13.5))
+            .translate((x, y, height - wall_thickness))
         
         shell_with_back_cutout = shell_with_back_cutout.union(positioned_corner_base)
     
