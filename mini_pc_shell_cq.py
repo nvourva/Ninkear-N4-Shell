@@ -17,12 +17,12 @@ def create_mini_pc_shell():
     edge_radius = 3.5
     
     # Top cutout dimensions
-    cutout_length = 80  # mm
-    cutout_width = 80   # mm
+    cutout_length = 84  # mm
+    cutout_width = 84   # mm
     
     # Back face cutout dimensions
     back_cutout_length = 89  # mm
-    back_cutout_width = 27   # mm
+    back_cutout_width = 30   # mm
     
     # Create the outer shell
     outer_shell = cq.Workplane("XY") \
@@ -83,7 +83,7 @@ def create_mini_pc_shell():
     # Center it on the back face
     positioned_back_cutout = back_cutout \
         .rotate((0,0,0), (1,0,0), 0) \
-        .translate((-length/2 + back_cutout_length/2 + 13, -51.5, back_cutout_width/2 + 7.5))
+        .translate((-length/2 + back_cutout_length/2 + 13, -51.5, back_cutout_width/2 + 4.5))
     
     # Cut out the back surface
     shell_with_back_cutout = shell_with_front_cutout.cut(positioned_back_cutout)
@@ -92,7 +92,7 @@ def create_mini_pc_shell():
     corner_base = create_corner_base()
     
     # Calculate corner positions
-    corner_offset = 38
+    corner_offset = 40
     corners = [
         (corner_offset, corner_offset),     # Top right
         (corner_offset, -corner_offset),    # Bottom right
@@ -111,16 +111,25 @@ def create_mini_pc_shell():
     
     # Create the structure to hold the fan.
     fan_box = cq.Workplane("XY") \
-        .rect(84, 84) \
+        .rect(92,92) \
         .extrude(25)
 
     # Create the inner cavity by subtracting the wall thickness
     inner_fan_box = cq.Workplane("XY") \
-    .rect(81, 81) \
+    .rect(90, 90) \
     .extrude(25)
     
     # Hollow the fan box structure
     fan_box_shell = fan_box.cut(inner_fan_box)
+    
+    # Create a rectangular cutout on one side
+    # The workplane is positioned on the side face
+    rectangle_cutout = cq.Workplane("ZX", origin=(20, -46, 18.75)) \
+    .rect(12.5, 4) \
+    .extrude(2)  # Extrude through the shell
+
+    # Cut the rectangle from the fan box shell
+    fan_box_shell = fan_box_shell.cut(rectangle_cutout)
     
     #Move the fan box to its proper location.
     position_fan_box_shell = fan_box_shell.translate((0,0,height))
